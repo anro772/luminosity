@@ -1,0 +1,7 @@
+# Normalize line endings; let Git handle conversion automatically.
+* text=auto
+
+# Treat these as binary (no EOL conversion / diffing).
+*.ico binary
+*.png binary
+*.exe binary
