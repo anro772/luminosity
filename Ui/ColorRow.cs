@@ -23,6 +23,18 @@ public static class ColorRow
     private static Brush B(string key) => (Brush)System.Windows.Application.Current.FindResource(key);
     private static Style S(string key) => (Style)System.Windows.Application.Current.FindResource(key);
 
+    /// <summary>The per-control spectrum gradient — the slider track "shows what it does".</summary>
+    private static Brush Spectrum(int type) => B(type switch
+    {
+        ControlType.Saturation => "SpectrumSaturation",
+        ControlType.Brightness => "SpectrumBrightness",
+        ControlType.Contrast => "SpectrumContrast",
+        ControlType.Gamma => "SpectrumGamma",
+        ControlType.Hue => "SpectrumHue",
+        ControlType.Temperature => "SpectrumTemperature",
+        _ => "AccentBrush",
+    });
+
     /// <summary>
     /// Adds a control row to <paramref name="parent"/> and returns its Slider.
     /// <paramref name="onChanged"/> fires on every value change (also sets <c>control.Current</c>).
@@ -35,8 +47,8 @@ public static class ColorRow
         var label = new TextBlock
         {
             Text = control.Name,
-            Foreground = B("MutedBrush"),
-            FontSize = 12,
+            Foreground = B("TextDimBrush"),
+            FontSize = 12.5,
             VerticalAlignment = VerticalAlignment.Center,
         };
 
@@ -55,8 +67,8 @@ public static class ColorRow
         var valueText = new TextBlock
         {
             Text = $"{control.Current}{control.Unit}",
-            Foreground = B("AccentBrush"),
-            FontSize = 12,
+            Foreground = B("TextBrush"),
+            FontSize = 12.5,
             FontWeight = FontWeights.SemiBold,
             HorizontalAlignment = HAlign.Right,
             VerticalAlignment = VerticalAlignment.Center,
@@ -78,6 +90,7 @@ public static class ColorRow
             SmallChange = control.Step,
             LargeChange = Math.Max(control.Step, (control.Max - control.Min) / 20.0),
             VerticalAlignment = VerticalAlignment.Center,
+            Tag = Spectrum(control.Type),   // per-control spectrum track (see Theme.xaml)
             ToolTip = $"{control.Name}: {control.Min}…{control.Max} (default {control.Default}). " +
                       "Click ↺ to reset · scroll to nudge.",
         };

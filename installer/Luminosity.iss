@@ -7,7 +7,7 @@
 ;     -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 
 #define MyAppName "Luminosity"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Andrei Stefan"
 #define MyAppURL "https://github.com/anro772/luminosity"
 #define MyAppExeName "Luminosity.exe"

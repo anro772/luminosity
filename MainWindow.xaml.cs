@@ -69,7 +69,9 @@ public partial class MainWindow : Window
         ApplySavedSettings();
 
         int n = _monitors.Count;
-        SubtitleText.Text = $"{n} display{(n == 1 ? "" : "s")}  ·  {_service.BackendName}";
+        SubtitleText.Text = $"{n} display{(n == 1 ? "" : "s")}";
+        BackendPillText.Text = _service.BackendName;
+        BackendPill.Visibility = n == 0 ? Visibility.Collapsed : Visibility.Visible;
         StatusText.Text = n == 0 ? "No adjustable displays found." : "";
 
         // If a game rule was active when displays changed, re-apply it to the rebuilt cards.
@@ -96,7 +98,9 @@ public partial class MainWindow : Window
     {
         var stack = new StackPanel();
 
-        stack.Children.Add(new TextBlock
+        // ---- header: title + sub on the left, capability badge on the right ----
+        var titleBox = new StackPanel();
+        titleBox.Children.Add(new TextBlock
         {
             Text = monitor.Title,
             FontSize = 15,
@@ -106,15 +110,47 @@ public partial class MainWindow : Window
         });
         if (!string.IsNullOrWhiteSpace(monitor.SubLabel))
         {
-            stack.Children.Add(new TextBlock
+            titleBox.Children.Add(new TextBlock
             {
                 Text = monitor.SubLabel,
                 Foreground = (Brush)FindResource("MutedBrush"),
-                FontSize = 11,
+                FontSize = 11.5,
+                Margin = new Thickness(0, 2, 0, 0),
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
         }
-        stack.Children.Add(new Border { Height = 12 }); // spacer
+
+        bool fullColor = monitor.Controls.Any(c => c.Type is ControlType.Saturation or ControlType.Hue);
+        var capBadge = new Border
+        {
+            Style = (Style)FindResource("CapBadge"),
+            Margin = new Thickness(8, 0, 0, 0),
+            Child = new TextBlock
+            {
+                Text = fullColor ? "Full controls" : "Gamma ramp",
+                Foreground = (Brush)FindResource("MutedBrush"),
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+            },
+        };
+
+        var header = new Grid();
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        Grid.SetColumn(titleBox, 0);
+        Grid.SetColumn(capBadge, 1);
+        header.Children.Add(titleBox);
+        header.Children.Add(capBadge);
+        stack.Children.Add(header);
+
+        // divider under the header
+        stack.Children.Add(new Border
+        {
+            Height = 1,
+            Background = (Brush)FindResource("CardBorderBrush"),
+            Margin = new Thickness(0, 14, 0, 16),
+            Opacity = 0.7,
+        });
 
         foreach (var control in monitor.Controls)
         {
@@ -126,8 +162,9 @@ public partial class MainWindow : Window
 
         var reset = new Button
         {
-            Content = "Reset this monitor",
+            Content = "↺  Reset this monitor",
             Style = (Style)FindResource("GhostButton"),
+            FontSize = 11.5,
             HorizontalAlignment = HAlign.Left,
             Margin = new Thickness(0, 4, 0, 0),
         };
@@ -196,7 +233,7 @@ public partial class MainWindow : Window
         _suppressPersist = false;
 
         SetControlsEnabled(false);
-        RuleBannerText.Text = $"●  Active: {rule.Name} — colors managed automatically until it closes.";
+        RuleBannerText.Text = $"Active: {rule.Name} — colors managed automatically until it closes.";
         RuleBanner.Visibility = Visibility.Visible;
     }
 

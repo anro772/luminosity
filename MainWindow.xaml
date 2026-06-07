@@ -9,67 +9,141 @@
         TextOptions.TextFormattingMode="Display"
         FontFamily="Segoe UI" FontSize="13" Foreground="{StaticResource TextBrush}">
 
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <Grid Grid.Row="0" Margin="0,0,0,16">
-            <StackPanel HorizontalAlignment="Left">
-                <TextBlock Text="Luminosity" FontSize="22" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextBrush}" />
-                <TextBlock x:Name="SubtitleText" Foreground="{StaticResource MutedBrush}" Margin="0,2,0,0" />
-            </StackPanel>
-            <Button x:Name="ResetAllButton" Content="Reset all to default" Style="{StaticResource GhostButton}"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" Click="ResetAll_Click" />
-        </Grid>
-
-        <!-- Active-rule banner -->
-        <Border x:Name="RuleBanner" Grid.Row="1" Visibility="Collapsed"
-                Background="{StaticResource AccentDimBrush}" CornerRadius="8"
-                Padding="14,9" Margin="0,0,0,14">
-            <TextBlock x:Name="RuleBannerText" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold" />
+    <!-- Root: deep-space backdrop with faint aurora nebula glows, then the app body. -->
+    <Grid>
+        <!-- aurora nebula leaking from the top corners (decorative, pointer-transparent) -->
+        <Border IsHitTestVisible="False">
+            <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.18,0" Center="0.18,0" RadiusX="0.7" RadiusY="0.6">
+                    <GradientStop Color="#335B7CFF" Offset="0" />
+                    <GradientStop Color="#005B7CFF" Offset="1" />
+                </RadialGradientBrush>
+            </Border.Background>
+        </Border>
+        <Border IsHitTestVisible="False">
+            <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.92,0.04" Center="0.92,0.04" RadiusX="0.7" RadiusY="0.6">
+                    <GradientStop Color="#2634E0E6" Offset="0" />
+                    <GradientStop Color="#0034E0E6" Offset="1" />
+                </RadialGradientBrush>
+            </Border.Background>
+        </Border>
+        <Border IsHitTestVisible="False">
+            <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.5,1.1" Center="0.5,1.1" RadiusX="0.7" RadiusY="0.55">
+                    <GradientStop Color="#225CF2A6" Offset="0" />
+                    <GradientStop Color="#005CF2A6" Offset="1" />
+                </RadialGradientBrush>
+            </Border.Background>
         </Border>
 
-        <!-- Monitor cards (filled in code-behind) -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl x:Name="MonitorsHost">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </ScrollViewer>
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <!-- Footer -->
-        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,16,0,0" Padding="16,12">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <Button x:Name="AppRulesButton" Grid.Column="0" Content="App rules…"
-                        Style="{StaticResource AccentButton}" Click="AppRules_Click" />
-
-                <TextBlock x:Name="StatusText" Grid.Column="1" HorizontalAlignment="Right"
-                           VerticalAlignment="Center" Margin="16,0,16,0"
-                           Foreground="{StaticResource MutedBrush}" FontSize="12" />
-
-                <CheckBox x:Name="StartupToggle" Grid.Column="2" Content="Run on Windows startup"
-                          VerticalAlignment="Center"
-                          Checked="StartupToggle_Changed" Unchecked="StartupToggle_Changed" />
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <!-- luminous orb logo (light source = "luminosity") -->
+                    <Grid Width="30" Height="30" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <Ellipse Width="34" Height="34" Opacity="0.55">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#5534E0E6" Offset="0" />
+                                    <GradientStop Color="#228D6CFF" Offset="0.5" />
+                                    <GradientStop Color="#008D6CFF" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <Ellipse Width="22" Height="22">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush GradientOrigin="0.38,0.34" Center="0.38,0.34" RadiusX="0.72" RadiusY="0.72">
+                                    <GradientStop Color="#EAFCFF" Offset="0" />
+                                    <GradientStop Color="#5CF2A6" Offset="0.32" />
+                                    <GradientStop Color="#34E0E6" Offset="0.62" />
+                                    <GradientStop Color="#8D6CFF" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Luminosity" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AuroraBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <TextBlock x:Name="SubtitleText" Foreground="{StaticResource MutedBrush}"
+                                       FontSize="12.5" VerticalAlignment="Center" />
+                            <Border x:Name="BackendPill" Style="{StaticResource BackendPill}" Margin="10,0,0,0"
+                                    Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="5" Height="5" Fill="{StaticResource AccentBrush}"
+                                             VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBlock x:Name="BackendPillText" Foreground="{StaticResource AccentBrush}"
+                                               FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+                <Button x:Name="ResetAllButton" Content="Reset all to default" Style="{StaticResource GhostButton}"
+                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="ResetAll_Click" />
             </Grid>
-        </Border>
 
-        <!-- In-app modal overlay for App rules (spans the whole window) -->
-        <local:AppRulesPanel x:Name="RulesOverlay" Grid.Row="0" Grid.RowSpan="4"
-                             Margin="-24" Visibility="Collapsed" />
+            <!-- Active-rule banner -->
+            <Border x:Name="RuleBanner" Grid.Row="1" Visibility="Collapsed"
+                    Background="{StaticResource AuroraSoftBrush}" BorderBrush="#3A34E0E6" BorderThickness="1"
+                    CornerRadius="12" Padding="16,12" Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="9" Height="9" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center"
+                             Margin="0,0,12,0">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#34E0E6" BlurRadius="10" ShadowDepth="0" Opacity="0.9" />
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <TextBlock x:Name="RuleBannerText" Foreground="{StaticResource TextBrush}"
+                               FontSize="13" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- Monitor cards (filled in code-behind) -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="MonitorsHost">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,16,0,0" Padding="16,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="AppRulesButton" Grid.Column="0" Content="App rules…"
+                            Style="{StaticResource AccentButton}" Click="AppRules_Click" />
+
+                    <TextBlock x:Name="StatusText" Grid.Column="1" HorizontalAlignment="Right"
+                               VerticalAlignment="Center" Margin="16,0,16,0"
+                               Foreground="{StaticResource MutedBrush}" FontSize="12" />
+
+                    <CheckBox x:Name="StartupToggle" Grid.Column="2" Content="Run on Windows startup"
+                              VerticalAlignment="Center"
+                              Checked="StartupToggle_Changed" Unchecked="StartupToggle_Changed" />
+                </Grid>
+            </Border>
+
+            <!-- In-app modal overlay for App rules (spans the whole window) -->
+            <local:AppRulesPanel x:Name="RulesOverlay" Grid.Row="0" Grid.RowSpan="4"
+                                 Margin="-24" Visibility="Collapsed" />
+        </Grid>
     </Grid>
 </Window>
