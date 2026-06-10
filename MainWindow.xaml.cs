@@ -52,7 +52,7 @@ public partial class MainWindow : Window
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
 
         RulesOverlay.Initialize(_settings, () => _monitors,
-            onRulesChanged: () => RequestRuleRecheck?.Invoke(),
+            onRulesChanged: () => { RefreshActiveRule(); RequestRuleRecheck?.Invoke(); },
             onClose: CloseRulesOverlay);
 
         StartupToggle.IsChecked = StartupService.IsEnabled();
@@ -251,6 +251,51 @@ public partial class MainWindow : Window
         _activeRule = null;
         SetControlsEnabled(true);
         RuleBanner.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// Re-applies the currently active rule after it's been edited in the App-rules panel, so changes
+    /// take effect live instead of only after a restart. The user's pre-game baseline is preserved:
+    /// controls dropped from the rule revert to baseline, and controls added snapshot their baseline
+    /// before being overridden.
+    /// </summary>
+    private void RefreshActiveRule()
+    {
+        if (_activeRule is null) return;
+        var rule = _activeRule;
+
+        // If the rule was deleted or disabled while active, let the watcher deactivate it instead.
+        if (!_settings.Settings.AppRules.Contains(rule) || !rule.Enabled) return;
+
+        _suppressPersist = true;
+
+        // Controls previously overridden but no longer in the rule → restore their baseline.
+        for (int i = _ruleSnapshot.Count - 1; i >= 0; i--)
+        {
+            var (b, original) = _ruleSnapshot[i];
+            bool stillInRule = rule.Values.TryGetValue(b.Monitor.Key, out var map)
+                               && map.ContainsKey(b.Control.Type.ToString());
+            if (!stillInRule)
+            {
+                b.Slider.Value = Math.Clamp(original, b.Control.Min, b.Control.Max);
+                _ruleSnapshot.RemoveAt(i);
+            }
+        }
+
+        // Apply the (possibly new) targets; snapshot baseline for any newly-overridden control.
+        foreach (var b in _bindings)
+        {
+            if (!rule.Values.TryGetValue(b.Monitor.Key, out var map)) continue;
+            if (!map.TryGetValue(b.Control.Type.ToString(), out int target)) continue;
+
+            if (!_ruleSnapshot.Any(s => ReferenceEquals(s.Binding, b)))
+                _ruleSnapshot.Add((b, b.Control.Current));   // capture baseline before overriding
+            b.Slider.Value = Math.Clamp(target, b.Control.Min, b.Control.Max);
+        }
+
+        _suppressPersist = false;
+
+        RuleBannerText.Text = $"Active: {rule.Name} — colors managed automatically until it closes.";
     }
 
     private void SetControlsEnabled(bool enabled)
